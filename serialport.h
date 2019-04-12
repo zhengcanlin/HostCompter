@@ -15,7 +15,7 @@ class SerialPort : public QObject
 {
     Q_OBJECT
 public:
-    explicit SerialPort(QObject *parent = nullptr);
+    explicit SerialPort(QObject *parent = 0);
     ~SerialPort();
 
     void SetBCD(QString PortName,QVector<int>& bcd);
