@@ -1,11 +1,54 @@
 #include "serialport.h"
 
 
-SerialPort::SerialPort():
+SerialPort::SerialPort(QObject *parent) :
+    QObject(parent),
     m_SerialPort(new QSerialPort)
 {
+    //当有数据进入缓冲区，从缓冲区读取数据
+    connect(m_SerialPort,SIGNAL(readyRead()),this,SLOT(ReadBuffSlot()));
+}
+
+bool SerialPort::CRC(QByteArray m_ByteArray){
+    //CRC校验，正确返回true  错误范围false
 
 }
+
+void SerialPort::ReadBuffSlot(){
+    //每次读取16byte 入 ReadBuf
+    this->ReadBuf.push_back(m_SerialPort->read(16));
+    QByteArray temp=ReadBuf.at(0);
+
+    //检查帧头
+    if(temp.at(0)==this->FrameHead1 && temp.at(1)==this->FrameHead2){
+        //CRC校验,成功，则将点加入m_pointset
+        if(CRC(temp)){
+            //读取点的信息
+            char Type;
+            int PanID;
+            double Point_X;
+            double Point_Y;
+
+            if(temp.at(4)==this->Type_B){
+                Type='B';
+            }
+            else if(temp.at(4)==this->Type_T){
+                Type='T';
+            }
+            PanID=(int)(temp.at(2)<<8|temp.at(3));
+            Point_X=(double)(temp.at(5)<<8|temp.at(6));
+            Point_Y=(double)(temp.at(7)<<8|temp.at(8));
+            this->m_PointSet.addPoint(Type,PanID,QPointF(Point_X,Point_Y));
+        }
+    }
+    this->ReadBuf.pop_front();
+}
+PointSet SerialPort::GetPointSet(){
+    PointSet res;
+    res=this->m_PointSet;
+    return res;
+}
+
 
 //设置串口BCD，由串口类调用
 //每次转换串口时，都需要先关闭串口，调用该函数之后，才能重新打开
@@ -89,4 +132,5 @@ void SerialPort::ClosePortSlot(){
 }
 SerialPort::~SerialPort(){
     delete m_SerialPort;
+    ReadBuf.clear();
 }

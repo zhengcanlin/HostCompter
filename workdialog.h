@@ -39,9 +39,8 @@ public:
     void initChart();
     void InitLayout();
     void InitCombobox();
-
+    void InitButton();
     void UpdateChart();
-
 public slots:
     void UpdatePortCom();
 private:
@@ -58,7 +57,7 @@ private:
     PointSet *pointset;
     QTimer *timers;
 
-
+    SerialPort *SerialServer;
 
 };
 

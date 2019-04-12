@@ -86,7 +86,8 @@ workdialog::workdialog(QWidget *parent)
     : QWidget(parent),
       tool_box(new control_s),
       pointset(new PointSet),
-      timers(new QTimer)
+      timers(new QTimer),
+      SerialServer(new SerialPort)
 {
     initChart();
     InitLayout();
@@ -186,7 +187,6 @@ void workdialog::InitLayout(){
 
     setLayout(main_layout);
 }
-
 void workdialog::InitCombobox(){
     QStringList lists;
 
@@ -221,6 +221,7 @@ void workdialog::InitCombobox(){
     connect(timers,SIGNAL(timeout()),this,SLOT(UpdatePortCom()));
 }
 
+//更新坐标系
 void workdialog::UpdateChart(){
     m_scatterSeries_B->clear();
     m_scatterSeries_T->clear();
@@ -233,8 +234,6 @@ void workdialog::UpdatePortCom(){
     QSerialPortInfo *serialportinfo=new QSerialPortInfo;
     SerialPortList=serialportinfo->availablePorts();
     //获取目前可用的串口
-
-
 
     int count_i=0;
     while(count_i<tool_box->combobox_port->count()){
@@ -267,9 +266,11 @@ void workdialog::UpdatePortCom(){
     }
 }
 
+
 workdialog::~workdialog()
 {
     delete tool_box;
     delete pointset;
     delete timers;
+    delete SerialServer;
 }
