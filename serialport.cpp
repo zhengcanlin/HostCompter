@@ -1,12 +1,10 @@
 #include "serialport.h"
 
-
-SerialPort::SerialPort(QObject *parent) :
-    QObject(parent),
+SerialPort::SerialPort(QObject *parent) : QObject(parent),
     m_SerialPort(new QSerialPort)
 {
-    //当有数据进入缓冲区，从缓冲区读取数据
-    connect(m_SerialPort,SIGNAL(readyRead()),this,SLOT(ReadBuffSlot()));
+    this->m_PointSet.addPoint('B',1,QPointF(1,1));
+    this->m_PointSet.addPoint('T',3,QPointF(4,4));
 }
 
 bool SerialPort::CRC(QByteArray m_ByteArray){
@@ -129,6 +127,9 @@ void SerialPort::OpenPortSlot(){
 void SerialPort::ClosePortSlot(){
     this->m_SerialPort->clear();
     this->m_SerialPort->close();
+}
+bool SerialPort::IFOPEN(){
+    return this->m_SerialPort->isOpen();
 }
 SerialPort::~SerialPort(){
     delete m_SerialPort;

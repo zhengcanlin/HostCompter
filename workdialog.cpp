@@ -85,8 +85,8 @@ struct workdialog::control_s{
 workdialog::workdialog(QWidget *parent)
     : QWidget(parent),
       tool_box(new control_s),
-      pointset(new PointSet),
       timers(new QTimer),
+      readtimer(new QTimer),
       SerialServer(new SerialPort)
 {
     initChart();
@@ -103,8 +103,6 @@ void workdialog::initChart(){
     m_scatterSeries_B->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_scatterSeries_T->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
     m_scatterSeries_T->setColor(Qt::lightGray);
-
-
 
     m_chart->addSeries(m_scatterSeries_B);
     m_chart->addSeries(m_scatterSeries_T);
@@ -216,19 +214,28 @@ void workdialog::InitCombobox(){
 
     lists.clear();
 
+    lists<<tr("AllPoint")<<tr("BaseNode")<<tr("FrameNode");
+    this->tool_box->combobox_Change->addItems(lists);
+    this->tool_box->combobox_Change->setCurrentIndex(0);
+
+    lists.clear();
 
     timers->start(50);
     connect(timers,SIGNAL(timeout()),this,SLOT(UpdatePortCom()));
 }
+void workdialog::InitButton(){
 
-//更新坐标系
-void workdialog::UpdateChart(){
-    m_scatterSeries_B->clear();
-    m_scatterSeries_T->clear();
-    m_scatterSeries_B->append(pointset->getPoint_B());
-    m_scatterSeries_T->append(pointset->getPoint_T());
+    connect(tool_box->openPortButton,SIGNAL(clicked(bool)),this,SLOT(OpenPort()));
+
+    connect(tool_box->closePortButton,SIGNAL(clicked(bool)),this,SLOT(ClosePort()));
+
+    connect(tool_box->setPortButton,SIGNAL(clicked(bool)),this,SLOT(ClosePort()));
+
+    connect(tool_box->clearButton2,SIGNAL(clicked(bool)),tool_box->show_the_data,SLOT(clear()));
+
+    connect(tool_box->clearButton1,SIGNAL(clicked(bool)),tool_box->send_data,SLOT(clear()));
+
 }
-
 void workdialog::UpdatePortCom(){
     QList<QSerialPortInfo> SerialPortList;
     QSerialPortInfo *serialportinfo=new QSerialPortInfo;
@@ -266,11 +273,54 @@ void workdialog::UpdatePortCom(){
     }
 }
 
+void workdialog::OpenPort(){
+    QVector<int> bcd;
+    QString portname;
+    portname=this->tool_box->combobox_port->currentText();
+
+    bcd.push_back(this->tool_box->combobox_BaudRate->currentText().toInt());
+    bcd.push_back(this->tool_box->combobox_Parity->currentIndex());
+    bcd.push_back(this->tool_box->combobox_Data->currentIndex());
+    bcd.push_back(this->tool_box->combobox_StopBit->currentIndex());
+
+    this->SerialServer->SetBCD(portname,bcd);
+    this->SerialServer->OpenPortSlot();
+    //如果打开成功，每500ms，从串口对象读取点集，然后用画布更新
+    this->readtimer->start(500);
+    connect(readtimer,SIGNAL(timeout()),this,SLOT(UpdateChart()));
+}
+
+void workdialog::ClosePort(){
+    this->SerialServer->ClosePortSlot();
+    this->readtimer->stop();
+}
+//更新坐标系
+void workdialog::UpdateChart(){
+    if(this->tool_box->combobox_Change->currentIndex()==0){
+        m_scatterSeries_B->clear();
+        m_scatterSeries_T->clear();
+        m_scatterSeries_B->append(this->SerialServer->GetPointSet().getPoint_B());
+        m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
+    }
+    if(this->tool_box->combobox_Change->currentIndex()==1){
+        m_scatterSeries_B->clear();
+        m_scatterSeries_T->clear();
+        m_scatterSeries_B->append(this->SerialServer->GetPointSet().getPoint_B());
+    }
+    if(this->tool_box->combobox_Change->currentIndex()==2){
+        m_scatterSeries_B->clear();
+        m_scatterSeries_T->clear();
+        m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
+    }
+}
+
+
+
 
 workdialog::~workdialog()
 {
     delete tool_box;
-    delete pointset;
     delete timers;
+    delete readtimer;
     delete SerialServer;
 }

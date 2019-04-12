@@ -2,7 +2,7 @@
 #define DIALOG_H
 
 #include "pointset.h"
-#include "serialport.h"
+#include "serialport_s.h"
 
 #include <QDialog>
 #include <QWidget>
@@ -40,9 +40,12 @@ public:
     void InitLayout();
     void InitCombobox();
     void InitButton();
-    void UpdateChart();
+
 public slots:
+    void OpenPort();
+    void ClosePort();
     void UpdatePortCom();
+    void UpdateChart();
 private:
     struct control_s;
     control_s *tool_box;
@@ -56,6 +59,7 @@ private:
 
     PointSet *pointset;
     QTimer *timers;
+    QTimer *readtimer;
 
     SerialPort *SerialServer;
 

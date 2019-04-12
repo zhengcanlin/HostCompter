@@ -9,19 +9,18 @@
 
 #include <QSerialPort>
 #include <QSerialPortInfo>
-
-
 class SerialPort : public QObject
 {
     Q_OBJECT
 public:
-    explicit SerialPort(QObject *parent = 0);
+    explicit SerialPort(QObject *parent = nullptr);
     ~SerialPort();
 
     void SetBCD(QString PortName,QVector<int>& bcd);
 
     void OpenPortSlot();
     void ClosePortSlot();
+    bool IFOPEN();
     PointSet GetPointSet();
 
     bool CRC(QByteArray m_ByteArray);
