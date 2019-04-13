@@ -113,61 +113,63 @@ void workdialog::initChart(){
     this->m_chart->createDefaultAxes();
 
     this->m_axisX=new QValueAxis;
-    m_axisX->setRange(0,100);
-    m_axisX->setGridLineVisible(true);
-    m_axisX->setTickCount(50);
+    this->m_axisX->setRange(0,100);
+    this->m_axisX->setGridLineVisible(true);
+    this->m_axisX->setTickCount(50);
 
     this->m_axisY=new QValueAxis;
-    m_axisY->setRange(0,100);
-    m_axisY->setGridLineVisible(true);
-    m_axisY->setTickCount(50);
+    this->m_axisY->setRange(0,100);
+    this->m_axisY->setGridLineVisible(true);
+    this->m_axisY->setTickCount(50);
 
-    m_chart->setAxisX(m_axisX,m_scatterSeries_B);
-    m_chart->setAxisY(m_axisY,m_scatterSeries_B);
-    m_chart->setAxisX(m_axisX,m_scatterSeries_T);
-    m_chart->setAxisY(m_axisY,m_scatterSeries_T);
+    this->m_chart->setAxisX(this->m_axisX,this->m_scatterSeries_B);
+    this->m_chart->setAxisY(this->m_axisY,this->m_scatterSeries_B);
+    this->m_chart->setAxisX(this->m_axisX,this->m_scatterSeries_T);
+    this->m_chart->setAxisY(this->m_axisY,this->m_scatterSeries_T);
 
-    m_chart->legend()->hide();
+    this->m_chart->legend()->hide();
 
-    m_chartView=new QChartView;
-    m_chartView->setChart(m_chart);
 
-    m_chartView->setVisible(true);
-    connect(readtimer,SIGNAL(timeout()),this,SLOT(UpdateChart()));
+    this->m_chartView=new QChartView;
+    this->m_chartView->setChart(this->m_chart);
 
-    connect(m_scatterSeries_B,SIGNAL(hovered(QPointF,bool)),this,SLOT(PointHoverdSlot(QPointF,bool)));
-    connect(m_scatterSeries_T,SIGNAL(hovered(QPointF,bool)),this,SLOT(PointHoverdSlot(QPointF,bool)));
+
+    this->m_chartView->setVisible(true);
+    connect(this->readtimer,SIGNAL(timeout()),this,SLOT(UpdateChart()));
+
+    connect(this->m_scatterSeries_B,SIGNAL(hovered(QPointF,bool)),this,SLOT(PointHoverdSlot(QPointF,bool)));
+    connect(this->m_scatterSeries_T,SIGNAL(hovered(QPointF,bool)),this,SLOT(PointHoverdSlot(QPointF,bool)));
 }
 void workdialog::InitLayout(){
-    tool_box->label_Change->setBuddy(tool_box->combobox_Change);
-    tool_box->label_port->setBuddy(tool_box->combobox_port);
-    tool_box->label_BaudRate->setBuddy(tool_box->combobox_BaudRate);
-    tool_box->label_Parity->setBuddy(tool_box->combobox_Parity);
-    tool_box->label_Data->setBuddy(tool_box->combobox_Data);
-    tool_box->label_StopBit->setBuddy(tool_box->combobox_StopBit);
+    this->tool_box->label_Change->setBuddy(this->tool_box->combobox_Change);
+    this->tool_box->label_port->setBuddy(this->tool_box->combobox_port);
+    this->tool_box->label_BaudRate->setBuddy(this->tool_box->combobox_BaudRate);
+    this->tool_box->label_Parity->setBuddy(this->tool_box->combobox_Parity);
+    this->tool_box->label_Data->setBuddy(this->tool_box->combobox_Data);
+    this->tool_box->label_StopBit->setBuddy(this->tool_box->combobox_StopBit);
 
     //窗口左上角布局管理器
     QFormLayout *left_first_layout=new QFormLayout;
-    left_first_layout->addRow(tool_box->label_Change,tool_box->combobox_Change);
-    left_first_layout->addRow(tool_box->label_port,tool_box->combobox_port);
-    left_first_layout->addRow(tool_box->label_BaudRate,tool_box->combobox_BaudRate);
-    left_first_layout->addRow(tool_box->label_Parity,tool_box->combobox_Parity);
-    left_first_layout->addRow(tool_box->label_Data,tool_box->combobox_Data);
-    left_first_layout->addRow(tool_box->label_StopBit,tool_box->combobox_StopBit);
+    left_first_layout->addRow(this->tool_box->label_Change,this->tool_box->combobox_Change);
+    left_first_layout->addRow(this->tool_box->label_port,this->tool_box->combobox_port);
+    left_first_layout->addRow(this->tool_box->label_BaudRate,this->tool_box->combobox_BaudRate);
+    left_first_layout->addRow(this->tool_box->label_Parity,this->tool_box->combobox_Parity);
+    left_first_layout->addRow(this->tool_box->label_Data,this->tool_box->combobox_Data);
+    left_first_layout->addRow(this->tool_box->label_StopBit,this->tool_box->combobox_StopBit);
 
     //窗口左中布局管理器
     QGridLayout *left_second_layout=new QGridLayout;
-    left_second_layout->addWidget(tool_box->openPortButton,0,0);
-    left_second_layout->addWidget(tool_box->closePortButton,0,1);
-    left_second_layout->addWidget(tool_box->setPortButton,1,0);
-    left_second_layout->addWidget(tool_box->clearButton2,1,1);
+    left_second_layout->addWidget(this->tool_box->openPortButton,0,0);
+    left_second_layout->addWidget(this->tool_box->closePortButton,0,1);
+    left_second_layout->addWidget(this->tool_box->setPortButton,1,0);
+    left_second_layout->addWidget(this->tool_box->clearButton2,1,1);
 
 
     //窗口左布局管理器
     QVBoxLayout *left_thrid_layout=new QVBoxLayout;
     left_thrid_layout->addLayout(left_first_layout);
     left_thrid_layout->addLayout(left_second_layout);
-    left_thrid_layout->addWidget(tool_box->show_the_data);
+    left_thrid_layout->addWidget(this->tool_box->show_the_data);
 
     /*
      *  设置左边的布局管理
@@ -176,12 +178,12 @@ void workdialog::InitLayout(){
      */
 
     QVBoxLayout *right_frist_layout=new QVBoxLayout;
-    right_frist_layout->addWidget(tool_box->sendDataButton);
-    right_frist_layout->addWidget(tool_box->clearButton1);
+    right_frist_layout->addWidget(this->tool_box->sendDataButton);
+    right_frist_layout->addWidget(this->tool_box->clearButton1);
 
     QHBoxLayout *right_second_layout=new QHBoxLayout;
     right_second_layout->addLayout(right_frist_layout,1);
-    right_second_layout->addWidget(tool_box->send_data,9);
+    right_second_layout->addWidget(this->tool_box->send_data,9);
 
     QVBoxLayout *right_thrid_layout=new QVBoxLayout;
     right_thrid_layout->addWidget(this->m_chartView,8);
@@ -191,8 +193,8 @@ void workdialog::InitLayout(){
     main_layout->addLayout(left_thrid_layout,1);
     main_layout->addLayout(right_thrid_layout,3);
 
-    tool_box->show_the_data->setReadOnly(true);
-    tool_box->clearButton2->setEnabled(false);
+    this->tool_box->show_the_data->setReadOnly(true);
+    this->tool_box->closePortButton->setEnabled(false);
     setLayout(main_layout);
 
 
@@ -232,20 +234,20 @@ void workdialog::InitCombobox(){
 
     lists.clear();
 
-    timers->start(50);
-    connect(timers,SIGNAL(timeout()),this,SLOT(UpdatePortCom()));
+    this->timers->start(50);
+    connect(this->timers,SIGNAL(timeout()),this,SLOT(UpdatePortCom()));
 }
 void workdialog::InitButton(){
 
-    connect(tool_box->openPortButton,SIGNAL(clicked(bool)),this,SLOT(OpenPort()));
+    connect(this->tool_box->openPortButton,SIGNAL(clicked(bool)),this,SLOT(OpenPort()));
 
-    connect(tool_box->closePortButton,SIGNAL(clicked(bool)),this,SLOT(ClosePort()));
+    connect(this->tool_box->closePortButton,SIGNAL(clicked(bool)),this,SLOT(ClosePort()));
 
-    connect(tool_box->setPortButton,SIGNAL(clicked(bool)),this,SLOT(ClosePort()));
+    connect(this->tool_box->setPortButton,SIGNAL(clicked(bool)),this,SLOT(ClosePort()));
 
-    connect(tool_box->clearButton2,SIGNAL(clicked(bool)),this,SLOT(UpdateEditSlot()));
+    connect(this->tool_box->clearButton2,SIGNAL(clicked(bool)),this,SLOT(UpdateEditSlot()));
 
-    connect(tool_box->clearButton1,SIGNAL(clicked(bool)),tool_box->send_data,SLOT(clear()));
+    connect(this->tool_box->clearButton1,SIGNAL(clicked(bool)),this->tool_box->send_data,SLOT(clear()));
 }
 void workdialog::UpdatePortCom(){
     QList<QSerialPortInfo> SerialPortList;
@@ -254,15 +256,15 @@ void workdialog::UpdatePortCom(){
     //获取目前可用的串口
 
     int count_i=0;
-    while(count_i<tool_box->combobox_port->count()){
+    while(count_i<this->tool_box->combobox_port->count()){
         int count_j;
         for(count_j=0;count_j<SerialPortList.length();count_j++){
-            if(tool_box->combobox_port->itemText(count_i)==SerialPortList[count_j].portName()){
+            if(this->tool_box->combobox_port->itemText(count_i)==SerialPortList[count_j].portName()){
                 break;
             }
         }
         if(count_j==SerialPortList.length()){
-            tool_box->combobox_port->removeItem(count_i);
+            this->tool_box->combobox_port->removeItem(count_i);
         }
         else {
             SerialPortList.removeAt(count_j);
@@ -274,22 +276,23 @@ void workdialog::UpdatePortCom(){
     }
     if(SerialPortList.isEmpty()==false){
         for(int i=0;i<SerialPortList.length();i++){
-            tool_box->combobox_port->addItem(SerialPortList[i].portName());
+            this->tool_box->combobox_port->addItem(SerialPortList[i].portName());
         }
     }
     else{
-        while(count_i<tool_box->combobox_port->count()){
-            tool_box->combobox_port->removeItem(count_i);
+        while(count_i<this->tool_box->combobox_port->count()){
+            this->tool_box->combobox_port->removeItem(count_i);
         }
     }
 }
 void workdialog::UpdateShowEdit(){
-    tool_box->show_the_data->append("观察对象："+tool_box->combobox_Change->currentText());
-    tool_box->show_the_data->append("使用串口："+tool_box->combobox_port->currentText());
-    tool_box->show_the_data->append("波特率："+tool_box->combobox_BaudRate->currentText());
-    tool_box->show_the_data->append("奇偶校验："+tool_box->combobox_Parity->currentText());
-    tool_box->show_the_data->append("数据位："+tool_box->combobox_Data->currentText());
-    tool_box->show_the_data->append("停止位："+tool_box->combobox_StopBit->currentText());
+    this->tool_box->show_the_data->clear();
+
+    this->tool_box->show_the_data->append("使用串口："+this->tool_box->combobox_port->currentText());
+    this->tool_box->show_the_data->append("波特率："+this->tool_box->combobox_BaudRate->currentText());
+    this->tool_box->show_the_data->append("奇偶校验："+this->tool_box->combobox_Parity->currentText());
+    this->tool_box->show_the_data->append("数据位："+this->tool_box->combobox_Data->currentText());
+    this->tool_box->show_the_data->append("停止位："+this->tool_box->combobox_StopBit->currentText());
 }
 
 
@@ -310,50 +313,68 @@ void workdialog::OpenPort(){
     if(this->SerialServer->IFOpen()){
         this->readtimer->start(500);
         UpdateShowEdit();
-        this->tool_box->clearButton2->setEnabled(true);
+        this->tool_box->setPortButton->setEnabled(false);
+        this->tool_box->combobox_BaudRate->setEnabled(false);
+        this->tool_box->combobox_port->setEnabled(false);
+        this->tool_box->combobox_Parity->setEnabled(false);
+        this->tool_box->combobox_Data->setEnabled(false);
+        this->tool_box->combobox_StopBit->setEnabled(false);
+        this->tool_box->openPortButton->setEnabled(false);
+        this->tool_box->closePortButton->setEnabled(true);
     }
 }
 void workdialog::ClosePort(){
     this->SerialServer->ClosePortSlot();
     this->readtimer->stop();
-    this->tool_box->clearButton2->setEnabled(false);
+    if(!this->SerialServer->IFOpen()){
+        this->tool_box->setPortButton->setEnabled(true);
+        this->tool_box->combobox_BaudRate->setEnabled(true);
+        this->tool_box->combobox_port->setEnabled(true);
+        this->tool_box->combobox_Parity->setEnabled(true);
+        this->tool_box->combobox_Data->setEnabled(true);
+        this->tool_box->combobox_StopBit->setEnabled(true);
+        this->tool_box->openPortButton->setEnabled(true);
+        this->tool_box->closePortButton->setEnabled(false);
+    }
 }
 //更新坐标系
 void workdialog::UpdateChart(){
     if(this->tool_box->combobox_Change->currentIndex()==0){
-        m_scatterSeries_B->clear();
-        m_scatterSeries_T->clear();
-        m_scatterSeries_B->append(this->SerialServer->GetPointSet().getPoint_B());
-        m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
+        this->m_scatterSeries_B->clear();
+        this->m_scatterSeries_T->clear();
+        this->m_scatterSeries_B->append(this->SerialServer->GetPointSet().getPoint_B());
+        this->m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
     }
     if(this->tool_box->combobox_Change->currentIndex()==1){
-        m_scatterSeries_B->clear();
-        m_scatterSeries_T->clear();
-        m_scatterSeries_B->append(this->SerialServer->GetPointSet().getPoint_B());
+        this->m_scatterSeries_B->clear();
+        this->m_scatterSeries_T->clear();
+        this->m_scatterSeries_B->append(this->SerialServer->GetPointSet().getPoint_B());
     }
     if(this->tool_box->combobox_Change->currentIndex()==2){
-        m_scatterSeries_B->clear();
-        m_scatterSeries_T->clear();
-        m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
+        this->m_scatterSeries_B->clear();
+        this->m_scatterSeries_T->clear();
+        this->m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
     }
 }
 void workdialog::UpdateEditSlot(){
-    this->tool_box->show_the_data->clear();
-    UpdateShowEdit();
+    if(this->SerialServer->IFOpen()){
+        UpdateShowEdit();
+    }
+    else this->tool_box->show_the_data->clear();
 }
 void workdialog::PointHoverdSlot(const QPointF &point, bool state){
     if(state){
         QString temp;
         temp+="("+QString::number(point.x())+","+QString::number(point.y())+")";
-        m_ValueLabel->setText(temp);
+        this->m_ValueLabel->setText(temp);
 
         QPoint curPos=mapFromGlobal(QCursor::pos());
-        m_ValueLabel->move(curPos.x() - m_ValueLabel->width()/2,curPos.y() - m_ValueLabel->height());
+        this->m_ValueLabel->move(curPos.x() - this->m_ValueLabel->width()/2,curPos.y() - this->m_ValueLabel->height());
 
-        m_ValueLabel->show();
+        this->m_ValueLabel->show();
     }
     else{
-        m_ValueLabel->hide();
+        this->m_ValueLabel->hide();
     }
 }
 
