@@ -85,6 +85,7 @@ struct workdialog::control_s{
 workdialog::workdialog(QWidget *parent)
     : QWidget(parent),
       tool_box(new control_s),
+      m_ValueLabel(new QLabel),
       timers(new QTimer),
       readtimer(new QTimer),
       SerialServer(new SerialPort)
@@ -93,32 +94,33 @@ workdialog::workdialog(QWidget *parent)
     InitLayout();
     InitCombobox();
     InitButton();
-
     this->resize(800,600);
 }
 
 void workdialog::initChart(){
-    m_chart=new QChart();
-    m_scatterSeries_B=new QScatterSeries;
-    m_scatterSeries_T=new QScatterSeries;
+    this->m_chart=new QChart();
+    this->m_scatterSeries_B=new QScatterSeries;
+    this->m_scatterSeries_T=new QScatterSeries;
 
-    m_scatterSeries_B->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    m_scatterSeries_T->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
-    m_scatterSeries_T->setColor(Qt::lightGray);
+    this->m_scatterSeries_B->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    this->m_scatterSeries_B->setMarkerSize(10);
+    this->m_scatterSeries_T->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    this->m_scatterSeries_T->setMarkerSize(10);
+    this->m_scatterSeries_T->setColor(Qt::lightGray);
 
-    m_chart->addSeries(m_scatterSeries_B);
-    m_chart->addSeries(m_scatterSeries_T);
-    m_chart->createDefaultAxes();
+    this->m_chart->addSeries(this->m_scatterSeries_B);
+    this->m_chart->addSeries(this->m_scatterSeries_T);
+    this->m_chart->createDefaultAxes();
 
     this->m_axisX=new QValueAxis;
-    m_axisX->setRange(0,10);
+    m_axisX->setRange(0,100);
     m_axisX->setGridLineVisible(true);
-    m_axisX->setTickCount(5);
+    m_axisX->setTickCount(50);
 
     this->m_axisY=new QValueAxis;
-    m_axisY->setRange(0,10);
+    m_axisY->setRange(0,100);
     m_axisY->setGridLineVisible(true);
-    m_axisY->setTickCount(5);
+    m_axisY->setTickCount(50);
 
     m_chart->setAxisX(m_axisX,m_scatterSeries_B);
     m_chart->setAxisY(m_axisY,m_scatterSeries_B);
@@ -132,6 +134,9 @@ void workdialog::initChart(){
 
     m_chartView->setVisible(true);
     connect(readtimer,SIGNAL(timeout()),this,SLOT(UpdateChart()));
+
+    connect(m_scatterSeries_B,SIGNAL(hovered(QPointF,bool)),this,SLOT(PointHoverdSlot(QPointF,bool)));
+    connect(m_scatterSeries_T,SIGNAL(hovered(QPointF,bool)),this,SLOT(PointHoverdSlot(QPointF,bool)));
 }
 void workdialog::InitLayout(){
     tool_box->label_Change->setBuddy(tool_box->combobox_Change);
@@ -186,7 +191,11 @@ void workdialog::InitLayout(){
     main_layout->addLayout(left_thrid_layout,1);
     main_layout->addLayout(right_thrid_layout,3);
 
+    tool_box->show_the_data->setReadOnly(true);
+    tool_box->clearButton2->setEnabled(false);
     setLayout(main_layout);
+
+
 }
 void workdialog::InitCombobox(){
     QStringList lists;
@@ -234,10 +243,9 @@ void workdialog::InitButton(){
 
     connect(tool_box->setPortButton,SIGNAL(clicked(bool)),this,SLOT(ClosePort()));
 
-    connect(tool_box->clearButton2,SIGNAL(clicked(bool)),tool_box->show_the_data,SLOT(clear()));
+    connect(tool_box->clearButton2,SIGNAL(clicked(bool)),this,SLOT(UpdateEditSlot()));
 
     connect(tool_box->clearButton1,SIGNAL(clicked(bool)),tool_box->send_data,SLOT(clear()));
-
 }
 void workdialog::UpdatePortCom(){
     QList<QSerialPortInfo> SerialPortList;
@@ -275,7 +283,17 @@ void workdialog::UpdatePortCom(){
         }
     }
 }
+void workdialog::UpdateShowEdit(){
+    tool_box->show_the_data->append("观察对象："+tool_box->combobox_Change->currentText());
+    tool_box->show_the_data->append("使用串口："+tool_box->combobox_port->currentText());
+    tool_box->show_the_data->append("波特率："+tool_box->combobox_BaudRate->currentText());
+    tool_box->show_the_data->append("奇偶校验："+tool_box->combobox_Parity->currentText());
+    tool_box->show_the_data->append("数据位："+tool_box->combobox_Data->currentText());
+    tool_box->show_the_data->append("停止位："+tool_box->combobox_StopBit->currentText());
+}
 
+
+//SLOT FUNCTION
 void workdialog::OpenPort(){
     QVector<int> bcd;
     QString portname;
@@ -291,12 +309,14 @@ void workdialog::OpenPort(){
         //如果打开成功，每500ms，从串口对象读取点集，然后用画布更新
     if(this->SerialServer->IFOpen()){
         this->readtimer->start(500);
+        UpdateShowEdit();
+        this->tool_box->clearButton2->setEnabled(true);
     }
 }
-
 void workdialog::ClosePort(){
     this->SerialServer->ClosePortSlot();
     this->readtimer->stop();
+    this->tool_box->clearButton2->setEnabled(false);
 }
 //更新坐标系
 void workdialog::UpdateChart(){
@@ -315,14 +335,32 @@ void workdialog::UpdateChart(){
         m_scatterSeries_B->clear();
         m_scatterSeries_T->clear();
         m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
-
     }
 }
+void workdialog::UpdateEditSlot(){
+    this->tool_box->show_the_data->clear();
+    UpdateShowEdit();
+}
+void workdialog::PointHoverdSlot(const QPointF &point, bool state){
+    if(state){
+        QString temp;
+        temp+="("+QString::number(point.x())+","+QString::number(point.y())+")";
+        m_ValueLabel->setText(temp);
 
+        QPoint curPos=mapFromGlobal(QCursor::pos());
+        m_ValueLabel->move(curPos.x() - m_ValueLabel->width()/2,curPos.y() - m_ValueLabel->height());
+
+        m_ValueLabel->show();
+    }
+    else{
+        m_ValueLabel->hide();
+    }
+}
 
 workdialog::~workdialog()
 {
     delete tool_box;
+    delete m_ValueLabel;
     delete timers;
     delete readtimer;
     delete SerialServer;

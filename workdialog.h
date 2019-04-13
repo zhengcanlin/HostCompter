@@ -40,12 +40,16 @@ public:
     void InitLayout();
     void InitCombobox();
     void InitButton();
-
+    void UpdateShowEdit();
 public slots:
     void OpenPort();                //打开串口，并且开始每500ms从串口对象读取点集更新画布
     void ClosePort();               //关闭串口和定时器
     void UpdatePortCom();           //更新串口combobox
     void UpdateChart();             //更新画布
+
+    void UpdateEditSlot();
+
+    void PointHoverdSlot(const QPointF &point,bool state);
 private:
     struct control_s;
     control_s *tool_box;
@@ -55,7 +59,7 @@ private:
     QValueAxis* m_axisX;
     QValueAxis* m_axisY;
     QChartView* m_chartView;
-    QLayout *layout;
+    QLabel *m_ValueLabel;
 
     QTimer *timers;
     QTimer *readtimer;
