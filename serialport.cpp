@@ -3,8 +3,6 @@
 SerialPort::SerialPort(QObject *parent) : QObject(parent),
     m_SerialPort(new QSerialPort)
 {
-    this->m_PointSet.addPoint('B',1,QPointF(1,1));
-    this->m_PointSet.addPoint('T',3,QPointF(4,4));
 }
 
 bool SerialPort::CRC(QByteArray m_ByteArray){
@@ -12,11 +10,16 @@ bool SerialPort::CRC(QByteArray m_ByteArray){
 
 }
 
+bool SerialPort::IFOpen(){
+    return this->m_SerialPort->isOpen();
+}
+
 void SerialPort::ReadBuffSlot(){
     //每次读取16byte 入 ReadBuf
     this->ReadBuf.push_back(m_SerialPort->read(16));
     QByteArray temp=ReadBuf.at(0);
 
+    this->FrameSum++;
     //检查帧头
     if(temp.at(0)==this->FrameHead1 && temp.at(1)==this->FrameHead2){
         //CRC校验,成功，则将点加入m_pointset
@@ -38,6 +41,12 @@ void SerialPort::ReadBuffSlot(){
             Point_Y=(double)(temp.at(7)<<8|temp.at(8));
             this->m_PointSet.addPoint(Type,PanID,QPointF(Point_X,Point_Y));
         }
+        else {
+            this->ErrorFrame++;
+        }
+    }
+    else {
+        this->ErrorFrame++;
     }
     this->ReadBuf.pop_front();
 }
@@ -128,9 +137,7 @@ void SerialPort::ClosePortSlot(){
     this->m_SerialPort->clear();
     this->m_SerialPort->close();
 }
-bool SerialPort::IFOPEN(){
-    return this->m_SerialPort->isOpen();
-}
+
 SerialPort::~SerialPort(){
     delete m_SerialPort;
     ReadBuf.clear();

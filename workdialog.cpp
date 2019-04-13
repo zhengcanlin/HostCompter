@@ -92,6 +92,8 @@ workdialog::workdialog(QWidget *parent)
     initChart();
     InitLayout();
     InitCombobox();
+    InitButton();
+
     this->resize(800,600);
 }
 
@@ -129,6 +131,7 @@ void workdialog::initChart(){
     m_chartView->setChart(m_chart);
 
     m_chartView->setVisible(true);
+    connect(readtimer,SIGNAL(timeout()),this,SLOT(UpdateChart()));
 }
 void workdialog::InitLayout(){
     tool_box->label_Change->setBuddy(tool_box->combobox_Change);
@@ -285,9 +288,10 @@ void workdialog::OpenPort(){
 
     this->SerialServer->SetBCD(portname,bcd);
     this->SerialServer->OpenPortSlot();
-    //如果打开成功，每500ms，从串口对象读取点集，然后用画布更新
-    this->readtimer->start(500);
-    connect(readtimer,SIGNAL(timeout()),this,SLOT(UpdateChart()));
+        //如果打开成功，每500ms，从串口对象读取点集，然后用画布更新
+    if(this->SerialServer->IFOpen()){
+        this->readtimer->start(500);
+    }
 }
 
 void workdialog::ClosePort(){
@@ -311,10 +315,9 @@ void workdialog::UpdateChart(){
         m_scatterSeries_B->clear();
         m_scatterSeries_T->clear();
         m_scatterSeries_T->append(this->SerialServer->GetPointSet().getPoint_T());
+
     }
 }
-
-
 
 
 workdialog::~workdialog()

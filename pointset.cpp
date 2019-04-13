@@ -36,6 +36,9 @@ void PointSet::addPoint(char Type, int PanID, QPointF points){
         }
     }
 }
+void PointSet::swaps(){
+    return;
+}
 PointSet::~PointSet(){
     B_Position.clear();
     T_Position.clear();

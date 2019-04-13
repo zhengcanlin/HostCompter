@@ -20,10 +20,10 @@ public:
 
     void OpenPortSlot();
     void ClosePortSlot();
-    bool IFOPEN();
     PointSet GetPointSet();
-
     bool CRC(QByteArray m_ByteArray);
+
+    bool IFOpen();
 public slots:
     void ReadBuffSlot();
 private:
@@ -35,6 +35,9 @@ private:
     char FrameHead2=(char)(221);     //0xdd
     char Type_B=(char)(171);         //0xab
     char Type_T=(char)(208);         //0xcd
+
+    int FrameSum=0;
+    int ErrorFrame=0;
 };
 
 #endif // SERIALPORT_H

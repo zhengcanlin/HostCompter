@@ -4,12 +4,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    //QMainWindow window;
     workdialog *w=new workdialog;
-    w->setWindowTitle("zhu");
+    w->setWindowTitle("HostComputer");
     w->show();
-    //window.setCentralWidget(w);
-    //window.show();
-
     return a.exec();
 }

@@ -2,7 +2,7 @@
 #define DIALOG_H
 
 #include "pointset.h"
-#include "serialport_s.h"
+#include "serialport.h"
 
 #include <QDialog>
 #include <QWidget>
@@ -42,10 +42,10 @@ public:
     void InitButton();
 
 public slots:
-    void OpenPort();
-    void ClosePort();
-    void UpdatePortCom();
-    void UpdateChart();
+    void OpenPort();                //打开串口，并且开始每500ms从串口对象读取点集更新画布
+    void ClosePort();               //关闭串口和定时器
+    void UpdatePortCom();           //更新串口combobox
+    void UpdateChart();             //更新画布
 private:
     struct control_s;
     control_s *tool_box;
@@ -57,12 +57,9 @@ private:
     QChartView* m_chartView;
     QLayout *layout;
 
-    PointSet *pointset;
     QTimer *timers;
     QTimer *readtimer;
-
     SerialPort *SerialServer;
-
 };
 
 #endif // DIALOG_H

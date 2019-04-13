@@ -12,6 +12,7 @@ public:
     QList<QPointF> getPoint_B();
     QList<QPointF> getPoint_T();
     void addPoint(char Type,int PanID,QPointF points);
+    void swaps();
 private:
     QMap<int,int> B_Position;
     QMap<int,int> T_Position;
