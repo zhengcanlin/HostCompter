@@ -20,13 +20,12 @@ struct workdialog::control_s{
     QPushButton *closePortButton;
     QPushButton *setPortButton;
     QPushButton *clearButton2;
-    QPushButton *clearButton1;
-    QPushButton *sendDataButton;
+    //QPushButton *clearButton1;
+    //QPushButton *sendDataButton;
 
 
     QTextEdit *show_the_data;
-    QTextEdit *send_data;
-
+    //QTextEdit *send_data;
 
     control_s(){
         label_BaudRate=new QLabel(tr("波特率"));
@@ -44,17 +43,16 @@ struct workdialog::control_s{
         combobox_port=new QComboBox;
 
 
-        clearButton1=new QPushButton(tr("清除发送框"));
+        //clearButton1=new QPushButton(tr("清除发送框"));
         clearButton2=new QPushButton(tr("清除打印框"));
-        sendDataButton=new QPushButton(tr("发送"));
+        //sendDataButton=new QPushButton(tr("发送"));
         openPortButton=new QPushButton(tr("打开串口"));
         closePortButton=new QPushButton(tr("关闭串口"));
         setPortButton=new QPushButton(tr("设置参数"));
 
 
         show_the_data=new QTextEdit;
-        send_data=new QTextEdit;
-
+        //send_data=new QTextEdit;
     }
     ~control_s(){
         delete label_BaudRate;
@@ -71,36 +69,36 @@ struct workdialog::control_s{
         delete combobox_Data;
         delete combobox_port;
 
-        delete clearButton1;
+        //delete clearButton1;
         delete clearButton2;
-        delete sendDataButton;
+        //delete sendDataButton;
         delete openPortButton;
         delete closePortButton;
         delete setPortButton;
 
         delete show_the_data;
-        delete send_data;
+        //delete send_data;
     }
 };
 workdialog::workdialog(QWidget *parent)
     : QWidget(parent),
       tool_box(new control_s),
-      m_ValueLabel(new QLabel),
       timers(new QTimer),
       readtimer(new QTimer),
       SerialServer(new SerialPort)
 {
+    this->resize(800,550);
     initChart();
     InitLayout();
     InitCombobox();
     InitButton();
-    this->resize(800,600);
 }
 
 void workdialog::initChart(){
     this->m_chart=new QChart();
-    this->m_scatterSeries_B=new QScatterSeries;
-    this->m_scatterSeries_T=new QScatterSeries;
+    this->m_scatterSeries_B=new QScatterSeries(m_chart);
+    this->m_scatterSeries_T=new QScatterSeries(m_chart);
+    this->m_ValueLabel=new QLabel(this);
 
     this->m_scatterSeries_B->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     this->m_scatterSeries_B->setMarkerSize(10);
@@ -128,13 +126,22 @@ void workdialog::initChart(){
     this->m_chart->setAxisY(this->m_axisY,this->m_scatterSeries_T);
 
     this->m_chart->legend()->hide();
-
+    this->m_chart->legend()->setVisible(false);
+    this->m_chart->setBackgroundVisible(false);
 
     this->m_chartView=new QChartView;
     this->m_chartView->setChart(this->m_chart);
-
-
     this->m_chartView->setVisible(true);
+
+
+    m_ValueLabel->setWindowFlags(Qt::WindowStaysOnTopHint);
+    m_ValueLabel->setStyleSheet(QString("QLabel{color:#1564FF; font-family:\"Microsoft Yahei\"; font-size:12px; font-weight:bold;"
+                                        " background-color:rgba(21, 100, 255, 51); border-radius:4px; text-align:center;}"));
+    m_ValueLabel->setFixedSize(44, 24);
+    m_ValueLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    m_ValueLabel->hide();
+    m_ValueLabel->raise();
+
     connect(this->readtimer,SIGNAL(timeout()),this,SLOT(UpdateChart()));
 
     connect(this->m_scatterSeries_B,SIGNAL(hovered(QPointF,bool)),this,SLOT(PointHoverdSlot(QPointF,bool)));
@@ -166,10 +173,11 @@ void workdialog::InitLayout(){
 
 
     //窗口左布局管理器
-    QVBoxLayout *left_thrid_layout=new QVBoxLayout;
-    left_thrid_layout->addLayout(left_first_layout);
-    left_thrid_layout->addLayout(left_second_layout);
-    left_thrid_layout->addWidget(this->tool_box->show_the_data);
+    QVBoxLayout *left_third_layout=new QVBoxLayout;
+    left_third_layout->addLayout(left_first_layout);
+    left_third_layout->addLayout(left_second_layout);
+    left_third_layout->addLayout(left_third_layout);
+    left_third_layout->addWidget(this->tool_box->show_the_data);
 
     /*
      *  设置左边的布局管理
@@ -177,27 +185,25 @@ void workdialog::InitLayout(){
      *  2-textedit
      */
 
-    QVBoxLayout *right_frist_layout=new QVBoxLayout;
-    right_frist_layout->addWidget(this->tool_box->sendDataButton);
-    right_frist_layout->addWidget(this->tool_box->clearButton1);
+//    QVBoxLayout *right_frist_layout=new QVBoxLayout;
+//    right_frist_layout->addWidget(this->tool_box->sendDataButton);
+//    right_frist_layout->addWidget(this->tool_box->clearButton1);
 
-    QHBoxLayout *right_second_layout=new QHBoxLayout;
-    right_second_layout->addLayout(right_frist_layout,1);
-    right_second_layout->addWidget(this->tool_box->send_data,9);
+//    QHBoxLayout *right_second_layout=new QHBoxLayout;
+//    right_second_layout->addLayout(right_frist_layout,1);
+//    right_second_layout->addWidget(this->tool_box->send_data,9);
 
     QVBoxLayout *right_thrid_layout=new QVBoxLayout;
-    right_thrid_layout->addWidget(this->m_chartView,8);
-    right_thrid_layout->addLayout(right_second_layout,2);
+    right_thrid_layout->addWidget(this->m_chartView);
+    //right_thrid_layout->addLayout(right_second_layout,2);
 
     QHBoxLayout *main_layout=new QHBoxLayout;
-    main_layout->addLayout(left_thrid_layout,1);
+    main_layout->addLayout(left_third_layout,1);
     main_layout->addLayout(right_thrid_layout,3);
 
     this->tool_box->show_the_data->setReadOnly(true);
     this->tool_box->closePortButton->setEnabled(false);
     setLayout(main_layout);
-
-
 }
 void workdialog::InitCombobox(){
     QStringList lists;
@@ -247,7 +253,7 @@ void workdialog::InitButton(){
 
     connect(this->tool_box->clearButton2,SIGNAL(clicked(bool)),this,SLOT(UpdateEditSlot()));
 
-    connect(this->tool_box->clearButton1,SIGNAL(clicked(bool)),this->tool_box->send_data,SLOT(clear()));
+    //connect(this->tool_box->clearButton1,SIGNAL(clicked(bool)),this->tool_box->send_data,SLOT(clear()));
 }
 void workdialog::UpdatePortCom(){
     QList<QSerialPortInfo> SerialPortList;
@@ -365,13 +371,16 @@ void workdialog::UpdateEditSlot(){
 void workdialog::PointHoverdSlot(const QPointF &point, bool state){
     if(state){
         QString temp;
-        temp+="("+QString::number(point.x())+","+QString::number(point.y())+")";
+        temp+="( "+QString::number(point.x())+" , "+QString::number(point.y())+" )";
+        //解析坐标
+        QPoint curPos=this->mapFromGlobal(QCursor::pos());
+        //获取当前鼠标相对于窗口的位置
+
         this->m_ValueLabel->setText(temp);
-
-        QPoint curPos=mapFromGlobal(QCursor::pos());
-        this->m_ValueLabel->move(curPos.x() - this->m_ValueLabel->width()/2,curPos.y() - this->m_ValueLabel->height());
-
-        this->m_ValueLabel->show();
+        this->m_ValueLabel->move(curPos.x() - m_ValueLabel->width() / 2, curPos.y() - m_ValueLabel->height() * 1.5);
+        //设置位置
+        m_ValueLabel->show();
+        m_ValueLabel->raise();
     }
     else{
         this->m_ValueLabel->hide();
@@ -381,8 +390,8 @@ void workdialog::PointHoverdSlot(const QPointF &point, bool state){
 workdialog::~workdialog()
 {
     delete tool_box;
-    delete m_ValueLabel;
     delete timers;
     delete readtimer;
     delete SerialServer;
+    delete m_ValueLabel;
 }
