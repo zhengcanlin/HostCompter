@@ -21,6 +21,7 @@ public:
     void OpenPortSlot();
     void ClosePortSlot();
     PointSet GetPointSet();
+    uint16_t CRC16(QByteArray m_ByteAarray,uint16_t ByteArraySize);
     bool CRC(QByteArray m_ByteArray);
 
     bool IFOpen();
